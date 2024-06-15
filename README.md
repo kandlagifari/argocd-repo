@@ -162,7 +162,7 @@ kubectl port-forward --address 0.0.0.0 -n argocd svc/argocd-server 30443:443
 
 **Step 2:** The API server can then be accessed using https://{{Public-IP}}:30443
 
-**Step 3** If you got the warning message **Your connection is not private**, please ignore it, and click **Advanced --> Proccess to {{Public-IP}}**. After that, you will be redirected to the ArgoCD server login page.
+**Step 3:** If you got the warning message **Your connection is not private**, please ignore it, and click **Advanced --> Proccess to {{Public-IP}}**. After that, you will be redirected to the ArgoCD server login page.
 
 ![Alt text](pics/02_argocd-login.png)
 
