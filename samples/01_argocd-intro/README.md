@@ -71,7 +71,7 @@ docker push kandlagifari/nginx:v0.1.0
 
 **Step 1**: Create GitHub Public Repository to store our nginx kubernetes manifests (you can also refer on the **argocd-nginx** directory)
 
-![Alt text](pics/02_docker-repo.png)
+![Alt text](pics/02_public-repo.png)
 
 **Step 2:** Create bare minimum **application.yaml** file
 
