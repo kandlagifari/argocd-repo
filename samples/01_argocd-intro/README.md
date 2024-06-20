@@ -223,15 +223,75 @@ spec:
       - PruneLast=true
 ```
 
-**Step 4:** Commit and push the changes
+**Step 4:** Re-apply **application.yaml** file to deploy nginx application
+```shell
+kubectl apply -f application.yaml
+
+
+# application.argoproj.io/my-app configured
+```
+
+**Step 5:** Commit and push the changes
 
 ```shell
 git add . && git commit -m "upgrade nginx to v0.1.2" && git push origin main
 ```
 
-**Step 5:** Wait few minutes, and you will see that our application has been deployed with new image tag **automatically** without need to click on Synchronize manually
+**Step 6:** Go to the **my-app** Argo CD application, and then click on **Refresh** to retrieve latest commit. Wait few minutes, and you will see that our application has been deployed with new image tag **automatically** without need to click on Synchronize manually
+
+![Alt text](pics/09_deploy-new-image-2.png)
 
 
+# Part 5: Automatically Update Image Tag Using Script
 
+**Step 1:** create file named **upgrade.sh** in the root directory, and copy this content (You can also adjust with your GitHub and Docker Hub repository)
+```shell
+#!/bin/bash
 
+# exit when any command fails
+set -e
+
+new_ver=$1
+
+echo "new version: $new_ver"
+
+# Simulate release of the new docker images
+docker tag nginx:1.27.0 kandlagifari/nginx:$new_ver
+
+# Push new version to dockerhub
+docker push kandlagifari/nginx:$new_ver
+
+# Create temporary folder
+tmp_dir=$(mktemp -d)
+echo $tmp_dir
+
+# Clone GitHub repo
+git clone https://github.com/kandlagifari/argocd-nginx.git $tmp_dir
+
+# Update image tag
+sed -i "s/kandlagifari\/nginx:.*/kandlagifari\/nginx:$new_ver/g" $tmp_dir/my-app/01_deployment.yaml
+
+# Commit and push
+cd $tmp_dir
+git add .
+git commit -m "Update image to $new_ver"
+git push
+
+# Optionally on build agents - remove folder
+rm -rf $tmp_dir
+```
+
+**Step 2:** Give the shell script executable permission
+
+```shell
+chmod +x upgrade.sh
+```
+
+**Step 3:** Run the shell script and give the argument based on the new image tag version
+
+```shell
+./upgrade.sh v0.1.3
+```
+
+**Step 6:** Go to the **my-app** Argo CD application, and then click on **Refresh** to retrieve latest commit. Wait few minutes, and you will see that our application has been deployed with new image tag **automatically** without need to click on Synchronize manually
 
