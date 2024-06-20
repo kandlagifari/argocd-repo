@@ -33,11 +33,6 @@ docker images
 
 ```shell
 docker tag nginx:1.27.0 kandlagifari/nginx:v0.1.0
-
-
-REPOSITORY            TAG         IMAGE ID       CREATED        SIZE
-kandlagifari/nginx    v0.1.0      dde0cca083bc   3 weeks ago    188MB
-nginx                 1.27.0      dde0cca083bc   3 weeks ago    188MB
 ```
 
 **Step 4:** We need to login first, before we can push the images into Docker Hub
@@ -107,3 +102,136 @@ kubectl apply -f application.yaml
 To actually deploy that, we need to click on **Sync -> Synchronize** (just keep the default value)
 
 ![Alt text](pics/04_argocd-application-2.png)
+
+
+# Part 3: Update Nginx Image
+
+**Step 1:** Update the image tag
+
+```shell
+docker tag nginx:1.27.0 kandlagifari/nginx:v0.1.1
+```
+
+**Step 2:** Push the updated image to Docker Hub
+
+```shell
+docker push kandlagifari/nginx:v0.1.1
+
+
+# The push refers to repository [docker.io/kandlagifari/nginx]
+# 10655d686986: Layer already exists
+# 3dd5fd695861: Layer already exists
+# eddb6eb0845b: Layer already exists
+# 8162731f1e8d: Layer already exists
+# cddaf363c4d4: Layer already exists
+# 409a3bc90254: Layer already exists
+# 1387079e86ad: Layer already exists
+# v0.1.1: digest: sha256:80550935209dd7f6b2d7e8401b9365837e3edd4b047f5a1a7d393e9f04d34498 size: 1778
+```
+
+**Step 3:** Update the image tag on the deployment manifest on the **argocd-nginx** repository to use **kandlagifari/nginx:v0.1.1** image
+
+![Alt text](pics/05_update-image-tag.png)
+
+**Step 4:** Commit and push the changes
+
+```shell
+git add . && git commit -m "upgrade nginx to v0.1.1" && git push origin main
+```
+
+**Step 5:** On the Argo CD **my-app** application, click on the **Refresh** button to get latest commit on the GitHub **argocd-nginx** repository
+
+**Step 6:** You will notice that, the Sync Status will be changes to **OutOfSync**
+
+![Alt text](pics/06_out-of-sync.png)
+
+Try to actually deploy it by clicking on **Sync -> Synchronize** (just keep the default value). Wait few minutes, and you will see that our application has been deployed with new image tag
+
+![Alt text](pics/07_deploy-new-image.png)
+
+
+# Part 4: Automatically Sync Updated Image
+
+**Step 1:** Update the image tag
+
+```shell
+docker tag nginx:1.27.0 kandlagifari/nginx:v0.1.2
+```
+
+**Step 2:** Push the updated image to Docker Hub
+
+```shell
+docker push kandlagifari/nginx:v0.1.2
+
+
+# The push refers to repository [docker.io/kandlagifari/nginx]
+# 10655d686986: Layer already exists
+# 3dd5fd695861: Layer already exists
+# eddb6eb0845b: Layer already exists
+# 8162731f1e8d: Layer already exists
+# cddaf363c4d4: Layer already exists
+# 409a3bc90254: Layer already exists
+# 1387079e86ad: Layer already exists
+# v0.1.2: digest: sha256:80550935209dd7f6b2d7e8401b9365837e3edd4b047f5a1a7d393e9f04d34498 size: 1778
+```
+
+**Step 3:** Update the image tag on the deployment manifest on the **argocd-nginx** repository to use **kandlagifari/nginx:v0.1.2** image
+
+![Alt text](pics/08_update-image-tag-2.png)
+
+**Step 4:** Add this code snippet on the **application.yaml** file
+
+```yaml
+    syncPolicy:
+        automated:
+        prune: true
+        selfHeal: true
+        allowEmpty: false
+        syncOptions:
+        - Validate=true
+        - CreateNamespace=false
+        - PrunePropagationPolicy=foreground
+        - PruneLast=true
+```
+
+So your full **application.yaml** will be like this
+
+```yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/kandlagifari/argocd-nginx.git
+    targetRevision: HEAD
+    path: my-app
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - Validate=true
+      - CreateNamespace=false
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+```
+
+**Step 4:** Commit and push the changes
+
+```shell
+git add . && git commit -m "upgrade nginx to v0.1.2" && git push origin main
+```
+
+**Step 5:** Wait few minutes, and you will see that our application has been deployed with new image tag **automatically** without need to click on Synchronize manually
+
+
+
+
+
