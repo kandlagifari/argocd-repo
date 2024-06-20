@@ -99,3 +99,11 @@ kubectl apply -f application.yaml
 
 # application.argoproj.io/my-app created
 ```
+
+**Step 4:** By default, Argo CD will automatically refresh and compare the state of **kubernetes** and **git**, but it would not apply it. This is the default strategy, and can be useful in Production environment, if you want very careful. However, we can also configure the git state and kubernetes state.
+
+![Alt text](pics/03_argocd-application.png)
+
+To actually deploy that, we need to click on **Sync -> Synchronize** (just keep the default value)
+
+![Alt text](pics/04_argocd-application-2.png)
