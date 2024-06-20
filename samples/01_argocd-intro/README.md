@@ -69,4 +69,33 @@ docker push kandlagifari/nginx:v0.1.0
 
 # Part 2: Deploy First Argo CD Application
 
-**Step 1:**
+**Step 1**: Create GitHub Public Repository to store our nginx kubernetes manifests (you can also refer on the **argocd-nginx** directory)
+
+![Alt text](pics/02_docker-repo.png)
+
+**Step 2:** Create bare minimum **application.yaml** file
+
+```yaml
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/kandlagifari/argocd-nginx.git
+    targetRevision: HEAD
+    path: my-app
+  destination:
+    server: https://kubernetes.default.svc
+```
+
+**Step 3:** Apply **application.yaml** file to deploy nginx application
+```shell
+kubectl apply -f application.yaml
+
+
+# application.argoproj.io/my-app created
+```

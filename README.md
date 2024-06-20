@@ -253,6 +253,34 @@ kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath='{.data.pas
 
 ![Alt text](pics/03_initial-password.png)
 
-**Step 3:** Input username and password for admin user, and hit Enter to sign in
+**Step 3:** If you would like to reset password, you can run these commands
+
+```shell
+argocd login --port-forward --port-forward-namespace argocd --plaintext localhost:30443
+
+
+# Username: admin
+# Password:
+# 'admin:login' logged in successfully
+# Context 'port-forward' updated
+```
+
+```shell
+argocd account update-password --account admin --new-password <your-new-password> --server localhost:30443
+
+
+# *** Enter password of currently logged in user (admin):
+# Password updated
+# Context 'port-forward' updated
+```
+
+```shell
+argocd logout port-forward
+
+
+# Logged out from 'port-forward'
+```
+
+**Step 4:** Input username and password for admin user, and hit Enter to sign in via Argo CD server on browser
 
 ![Alt text](pics/04_argocd-applications.png)
