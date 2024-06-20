@@ -133,6 +133,15 @@ helm repo add argocd https://argoproj.github.io/argo-helm
 
 **Step 2:** You can search available Chart on the ArgoCD Repo by running this command
 ```shell
+helm repo update
+
+
+# Hang tight while we grab the latest from your chart repositories...
+# ...Successfully got an update from the "argocd" chart repository
+# Update Complete. ⎈Happy Helming!⎈
+```
+
+```shell
 helm search repo argocd
 
 
@@ -148,6 +157,38 @@ helm search repo argocd
 # argocd/argo-lite                0.1.0                           Lighweight workflow engine for Kubernetes
 # argocd/argo-rollouts            2.36.0          v1.7.0          A Helm chart for Argo Rollouts
 # argocd/argo-workflows           0.41.11         v3.5.8          A Helm chart for Argo Workflows
+```
+
+**Step 3:** Deploy Argo CD components Helm Chart using Terraform
+```shell
+make tfi && make tfa
+```
+You will be prompted to perform action, just input the value **yes** and hit Enter
+
+![Alt text](pics/00_terraform.png)
+
+**Step 4 [Optional]:** Import existing terraform resources, and re-apply it if necessary
+```shell
+helm ls -A
+
+
+# NAME    NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
+# argocd  argocd          1               2024-06-19 17:53:49.957581613 +0700 WIB deployed        argo-cd-7.1.4   v2.11.3
+```
+
+```shell
+terraform import helm_release.argocd argocd/argocd
+
+
+# helm_release.argocd: Importing from ID "argocd/argocd"...
+# helm_release.argocd: Import prepared!
+#   Prepared helm_release for import
+# helm_release.argocd: Refreshing state... [id=argocd]
+
+# Import successful!
+
+# The resources that were imported are shown above. These resources are now in
+# your Terraform state and will henceforth be managed by Terraform.
 ```
 
 
@@ -198,7 +239,7 @@ kubectl port-forward --address 0.0.0.0 -n argocd svc/argocd-server 30443:443
 
 # Part 4: Login to Argo CD Server
 
-**Step 1:** The initial password for the admin account is auto-generated and stored as clear text in the field password in a secret named argocd-initial-admin-secret in your Argo CD installation namespace. You can simply retrieve this password using the argocd CLI:
+**Step 1:** The initial password for the **admin** user account is auto-generated and stored as clear text in the field password in a secret named argocd-initial-admin-secret in your Argo CD installation namespace. You can simply retrieve this password using the argocd CLI:
 
 ```shell
 argocd admin initial-password -n argocd
@@ -212,3 +253,6 @@ kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath='{.data.pas
 
 ![Alt text](pics/03_initial-password.png)
 
+**Step 3:** Input username and password for admin user, and hit Enter to sign in
+
+![Alt text](pics/04_argocd-applications.png)

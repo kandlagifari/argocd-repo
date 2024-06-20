@@ -1,0 +1,3 @@
+[submodule "argocd-nginx"]
+	path = argocd-nginx
+	url = https://github.com/kandlagifari/argocd-nginx
