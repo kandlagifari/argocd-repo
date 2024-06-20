@@ -293,6 +293,6 @@ chmod +x upgrade.sh
 ./upgrade.sh v0.1.3
 ```
 
-**Step 6:** Go to the **my-app** Argo CD application, and then click on **Refresh** to retrieve latest commit. Wait few minutes, and you will see that our application has been deployed with new image tag **automatically** without need to click on Synchronize manually
+**Step 4:** Go to the **my-app** Argo CD application, and then click on **Refresh** to retrieve latest commit. Wait few minutes, and you will see that our application has been deployed with new image tag **automatically** without need to click on Synchronize manually
 
 ![Alt text](pics/10_deploy-new-image-3.png)
