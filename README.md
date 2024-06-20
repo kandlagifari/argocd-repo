@@ -1,4 +1,4 @@
-# Part 1: Install ArgoCD
+# Part 1a: Install ArgoCD (Vanilla)
 
 **Step 1:** Create Argo CD namespace by running this command
 
@@ -121,6 +121,35 @@ kubectl get all -n argocd
 # statefulset.apps/argocd-application-controller   1/1     60s
 ```
 
+# Part 1b: Install ArgoCD (Helm Repo)
+
+**Step 1:** Add ArgoCD Helm repository
+```shell
+helm repo add argocd https://argoproj.github.io/argo-helm
+
+
+# "argocd" has been added to your repositories
+```
+
+**Step 2:** You can search available Chart on the ArgoCD Repo by running this command
+```shell
+helm search repo argocd
+
+
+# NAME                            CHART VERSION   APP VERSION     DESCRIPTION
+# argocd/argocd-applicationset    1.12.1          v0.4.1          A Helm chart for installing ArgoCD ApplicationSet
+# argocd/argocd-apps              2.0.0                           A Helm chart for managing additional Argo CD Ap...
+# argocd/argocd-image-updater     0.10.2          v0.13.1         A Helm chart for Argo CD Image Updater, a tool ...
+# argocd/argocd-notifications     1.8.1           v1.2.1          A Helm chart for ArgoCD notifications, an add-o...
+# argocd/argo                     1.0.0           v2.12.5         A Helm chart for Argo Workflows
+# argocd/argo-cd                  7.1.4           v2.11.3         A Helm chart for Argo CD, a declarative, GitOps...
+# argocd/argo-ci                  1.0.0           v1.0.0-alpha2   A Helm chart for Argo-CI
+# argocd/argo-events              2.4.6           v1.9.2          A Helm chart for Argo Events, the event-driven ...
+# argocd/argo-lite                0.1.0                           Lighweight workflow engine for Kubernetes
+# argocd/argo-rollouts            2.36.0          v1.7.0          A Helm chart for Argo Rollouts
+# argocd/argo-workflows           0.41.11         v3.5.8          A Helm chart for Argo Workflows
+```
+
 
 # Part 2: Download Argo CD CLI
 
@@ -167,5 +196,19 @@ kubectl port-forward --address 0.0.0.0 -n argocd svc/argocd-server 30443:443
 ![Alt text](pics/02_argocd-login.png)
 
 
+# Part 4: Login to Argo CD Server
 
+**Step 1:** The initial password for the admin account is auto-generated and stored as clear text in the field password in a secret named argocd-initial-admin-secret in your Argo CD installation namespace. You can simply retrieve this password using the argocd CLI:
+
+```shell
+argocd admin initial-password -n argocd
+```
+
+**Step 2:** You can also retrieved initial password in the argocd secret, by running this command
+
+```shell
+kubectl get secret -n argocd argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+```
+
+![Alt text](pics/03_initial-password.png)
 
